@@ -9,9 +9,7 @@ import io.appium.java_client.service.local.flags.GeneralServerFlag;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.lang.UsesSunMisc;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import org.testng.annotations.*;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -27,17 +25,16 @@ public class SampleTest {
     private DesiredCapabilities capabilities = new DesiredCapabilities();
     private AppiumDriverLocalService appiumService;
 
-    @BeforeClass
+    @BeforeTest
     public void setUp() throws MalformedURLException {
         appiumService = AppiumDriverLocalService.buildDefaultService();
         appiumService.start();
-        //String appiumServiceUrl = appiumService.getUrl().toString();
         capabilities.setCapability("noReset", "false");
         capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, "TestDevice");
         capabilities.setCapability(MobileCapabilityType.NEW_COMMAND_TIMEOUT, 700000);
         capabilities.setCapability(MobileCapabilityType.AUTOMATION_NAME, "UIAutomator2");
         capabilities.setCapability(MobileCapabilityType.APP, System.getProperty("user.dir") + "/VodQA.apk");
-        driver = new AndroidDriver<MobileElement>(new URL("http://127.0.0.1:4723/wd/hub"), capabilities);
+        driver = new AndroidDriver<MobileElement>(new URL(appiumService.getUrl().toString()), capabilities);
 
 
     }
@@ -48,9 +45,11 @@ public class SampleTest {
         wait.until(presenceOfElementLocated(MobileBy.AccessibilityId("login"))).click();
     }
 
-    @AfterClass
+    @AfterTest
     public void tearDown() {
+
         driver.quit();
+        appiumService.stop();
     }
 
 
