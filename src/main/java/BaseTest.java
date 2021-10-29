@@ -3,6 +3,9 @@ import io.appium.java_client.MobileElement;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.remote.AndroidMobileCapabilityType;
 import io.appium.java_client.remote.MobileCapabilityType;
+import io.appium.java_client.service.local.AppiumDriverLocalService;
+import io.appium.java_client.service.local.AppiumServiceBuilder;
+import io.appium.java_client.service.local.flags.GeneralServerFlag;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -19,8 +22,12 @@ public class BaseTest {
     public AppiumDriver driver;
     DesiredCapabilities caps;
     public WebDriverWait wait;
+    private static AppiumDriverLocalService service = null;
+    private AppiumServiceBuilder builder = null;
 
-    @BeforeClass public void setUp() throws MalformedURLException {
+
+    @BeforeClass
+    public void setUp() throws MalformedURLException {
         caps = new DesiredCapabilities();
         caps.setCapability(MobileCapabilityType.DEVICE_NAME, "android");
         caps.setCapability(MobileCapabilityType.PLATFORM_VERSION, "5.0");
@@ -29,14 +36,18 @@ public class BaseTest {
                 "org.wordpress.android.ui.WPLaunchActivity");
         caps.setCapability(MobileCapabilityType.APP,
                 System.getProperty("user.dir") + "/build/wordpress.apk");
-        driver = new AndroidDriver(new URL("http://127.0.0.1:4723/wd/hub"), caps);
+
+
+        driver = new AndroidDriver(service, caps);
     }
 
-    @AfterClass public void tearDown() {
+    @AfterClass
+    public void tearDown() {
         driver.quit();
     }
 
-    public void waitForElement(AppiumDriver driver,MobileElement id){
+
+    public void waitForElement(AppiumDriver driver, MobileElement id) {
         wait = new WebDriverWait(driver, 30);
         wait.until(ExpectedConditions
                 .elementToBeClickable(id));
